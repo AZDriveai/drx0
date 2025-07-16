@@ -4,113 +4,81 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-  }
+    --background: 220 10% 3%; /* #1e1f22 */
+    --foreground: 210 40% 98%; /* #f8f8f7 */
 
-  .dark {
-    --background: 30 8% 12%;
-    --foreground: 210 40% 98%;
-    --card: 30 8% 12%;
+    --card: 220 10% 3%;
     --card-foreground: 210 40% 98%;
-    --popover: 30 8% 12%;
+
+    --popover: 220 10% 3%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+
+    --primary: 210 40% 98%; /* White for primary buttons */
+    --primary-foreground: 220 10% 3%; /* Black for text on primary */
+
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 220 10% 3%;
+
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.5%;
+
+    --accent: 215 27.9% 16.9%;
     --accent-foreground: 210 40% 98%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+
+    --border: 215 27.9% 16.9%; /* Gray for borders */
+    --input: 215 27.9% 16.9%;
+    --ring: 210 40% 98%;
+
+    --radius: 0.5rem;
+
+    /* Custom colors for Dr.X theme */
+    --surface-base: 220 10% 3%; /* #1e1f22 */
+    --surface-l2: 218 11% 10%; /* #2a2d31 */
+    --fg-primary: 210 40% 98%; /* #f8f8f7 */
+    --fg-secondary: 217.9 10.6% 64.5%; /* #a1a1aa */
+    --highlight: 220 100% 50%; /* Example blue for highlight */
+    --button-primary: 0 0% 100%; /* White */
+    --button-primary-hover: 0 0% 90%; /* Light gray */
+    --button-ghost-hover: 218 11% 10%; /* #2a2d31 */
+    --button-secondary-hover: 218 11% 10%; /* #2a2d31 */
+    --border-l1: 215 27.9% 16.9%; /* #3f3f46 */
+    --border-l2: 215 27.9% 16.9%; /* #3f3f46 */
+    --toggle-border: 215 27.9% 16.9%; /* #3f3f46 */
+    --warm-gray-100: 210 40% 98%; /* White */
+    --gray-600: 215 14% 34%; /* Darker gray for send button */
+    --blue-400: 210 100% 50%; /* Blue for Dr.X 3 text */
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
     @apply bg-background text-foreground;
   }
 }
 
-/* Custom font classes to match original */
-.font-body {
-  font-family: Vazirmatn, "Vazirmatn Fallback", Inter, "Inter Fallback", Roboto, "Open Sans", Arial, sans-serif;
+/* Custom styles to match Dr.X design */
+.query-bar {
+  background-color: hsl(var(--surface-l2));
+  border-color: hsl(var(--border-l1));
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* RTL Support */
-[dir="rtl"] {
-  text-align: right;
+.query-bar:hover {
+  border-color: hsl(var(--border-l2));
 }
 
-/* Custom scrollbar */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 4px;
+.query-bar:focus-within {
+  border-color: hsl(var(--border-l2));
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: transparent;
+textarea {
+  scrollbar-width: none; /* Firefox */
 }
 
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Container queries support */
-@container (min-width: 640px) {
-  .sm\:flex {
-    display: flex;
-  }
-}
-
-@container (min-width: 1280px) {
-  .xl\:w-4\/5 {
-    width: 80%;
-  }
-}
-
-/* Custom breakout max width */
-.max-w-breakout {
-  max-width: 65rem;
-}
-
-/* No touch scrollbar */
-.no-touch-scrollbar {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.no-touch-scrollbar::-webkit-scrollbar {
-  display: none;
+textarea::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

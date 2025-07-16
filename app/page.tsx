@@ -77,7 +77,7 @@ export default function DrXChat() {
                   variant="outline"
                   className="rounded-full px-4 py-2 text-sm border-gray-600 bg-transparent hover:bg-white/10"
                 >
-                  <User className="h-4 w-4 ml-2 text-gray-400" />
+                  <User className="h-4 w-4 ml-2" />
                   شخصيات
                   <ChevronDown className="h-3 w-3 mr-2" />
                 </Button>

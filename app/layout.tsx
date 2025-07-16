@@ -6,18 +6,18 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Dr.X - مساعد ذكي",
-  description: "Dr.X هو مساعد ذكي مصمم لتقديم إجابات دقيقة وموضوعية",
+  title: "Dr.X Chat App",
+  description: "A chat application inspired by Dr.X",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
-    <html lang="ar" dir="rtl" className="dark">
+    <html lang="ar" dir="rtl">
       <body className={inter.className}>{children}</body>
     </html>
   )
