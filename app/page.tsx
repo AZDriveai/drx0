@@ -1,14 +1,13 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
-import { useChat } from "ai/react" // Re-introducing useChat
-import { Button } from "@/components/ui/button" // Assuming these components are available
+import { useChat } from "ai/react"
+import { Button } from "@/components/ui/button"
 import { Search, Settings, User, Newspaper, ChevronDown, Paperclip, ArrowUp, ImageIcon, Sparkles, Brain, Layers } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 // Define a placeholder for Image component if it's not available in this environment
 const Image = ({ src, alt, width, height, className }) => {
-  // Use the new placeholder image URLs provided by the user
   const placeholderSrc = src.includes('88x33') 
     ? 'https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/e0f8aad7-058d-48db-8441-017105a8ca21' 
     : 'https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/e0f8aad7-058d-48db-8441-017105a8ca21';
@@ -17,11 +16,10 @@ const Image = ({ src, alt, width, height, className }) => {
 
 
 export default function DrXChat() {
-  // State for managing thinking animation and manifestation
+  // State for managing thinking animation
   const [isThinking, setIsThinking] = useState(false);
   const [currentStage, setCurrentStage] = useState(0);
-  const [completedStages, setCompletedStages] = new Set();
-  const [manifestationVisible, setManifestationVisible] = useState(false);
+  const [completedStages, setCompletedStages] = useState(new Set()); 
   const stageTimerRef = useRef(null);
   const thinkingStartTime = useRef(0);
   
@@ -34,15 +32,20 @@ export default function DrXChat() {
     },
     onFinish: () => {
       // Ensure thinking display ends when response is finished
-      if (isThinking) handleThinkingEnd();
+      handleThinkingEnd();
     },
     onError: (error) => {
       console.error("Chat error:", error);
-      if (isThinking) handleThinkingEnd();
+      handleThinkingEnd(); // Ensure thinking display ends even on error
       // Optionally, add an error message to the chat
       // setMessages((prevMessages) => [...prevMessages, { id: `error-${Date.now()}`, role: 'assistant', content: "حدث خطأ أثناء توليد الاستجابة. يرجى المحاولة مرة أخرى." }]);
     }
   });
+
+  // Log messages to console to debug if they are being received
+  useEffect(() => {
+    console.log("Current messages state:", messages);
+  }, [messages]);
 
   // Cosmic Thinking Stages
   const THINKING_STAGES = [
@@ -55,10 +58,9 @@ export default function DrXChat() {
   // Function to start the thinking process
   const handleThinkingStart = () => {
     setIsThinking(true);
-    setManifestationVisible(true);
     thinkingStartTime.current = Date.now();
     setCurrentStage(0);
-    setCompletedStages(new Set());
+    setCompletedStages(new Set()); 
     
     // Advance stages with a delay
     let stageCounter = 0;
@@ -83,16 +85,11 @@ export default function DrXChat() {
     setTimeout(() => {
       setIsThinking(false);
       clearTimeout(stageTimerRef.current);
-      
-      // Show final manifestation message briefly
-      setManifestationVisible(true);
-      setTimeout(() => setManifestationVisible(false), 3000); // Display for 3 seconds
     }, remainingTime);
   };
 
   // Handle form submission - now directly uses handleSubmit from useChat
   const handleFormSubmit = (e) => {
-    // handleThinkingStart will be called by useChat's onResponse
     handleSubmit(e);
   };
 
@@ -163,7 +160,8 @@ export default function DrXChat() {
       </header>
 
       {/* Thinking Manifestation Overlay */}
-      {manifestationVisible && (
+      {/* This overlay is now controlled solely by isThinking state */}
+      {isLoading && ( // Changed from isThinking to isLoading for the overlay
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fadeIn">
           <div className="bg-gradient-to-br from-[#1e1b4b] to-[#0c0a26] p-8 rounded-3xl border border-purple-500/50 max-w-md text-center shadow-2xl animate-scaleIn relative overflow-hidden">
             {/* Pulsing glow effect */}
@@ -175,8 +173,8 @@ export default function DrXChat() {
               <div className="flex justify-center mb-4">
                 <Sparkles className="h-14 w-14 text-yellow-300 animate-sparkle-pulse" />
               </div>
-              <h3 className="text-3xl font-extrabold mb-3 text-purple-200 drop-shadow-lg">اكتمل التفكير الكوني</h3>
-              <p className="text-lg mb-6 text-gray-300">د.إكس على وشك الإجابة على استفسارك...</p>
+              <h3 className="text-3xl font-extrabold mb-3 text-purple-200 drop-shadow-lg">د.إكس في حالة تفكير عميق</h3>
+              <p className="text-lg mb-6 text-gray-300">جاري بلورة الرؤية النهائية...</p>
               <div className="flex justify-center space-x-4">
                 {[1, 2, 3].map(num => (
                   <div 
@@ -196,7 +194,7 @@ export default function DrXChat() {
       {/* Main Content */}
       <main className="pt-16 min-h-screen flex flex-col">
         {/* Center Content */}
-        <div className="flex-1 flex flex-col items-center justify-start px-4 pb-32 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 flex flex-col items-center justify-start px-4 pb-32 overflow-y-auto custom-scrollbar z-10"> {/* Added z-10 here */}
           {/* Large Logo - Only visible when no messages */}
           {messages.length === 0 && (
             <div className="mb-12 mt-24 flex flex-col items-center justify-center">
@@ -240,7 +238,7 @@ export default function DrXChat() {
                     <ChevronDown className="h-4 w-4 mr-2" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200">
+                <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200" key="dropdown-menu-content-mobile">
                   <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">المميز 1</DropdownMenuItem>
                   <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">المتقدم 2</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -249,7 +247,7 @@ export default function DrXChat() {
           )}
 
           {/* Chat Messages */}
-          <div className="w-full max-w-4xl mb-6 space-y-6 px-2">
+          <div className="w-full max-w-4xl mb-6 space-y-6 px-2 z-20"> {/* Added z-20 here */}
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
@@ -264,8 +262,8 @@ export default function DrXChat() {
               </div>
             ))}
             
-            {/* Display Thinking Process */}
-            {isThinking && (
+            {/* Display Thinking Process - This block will now appear as a chat message */}
+            {isThinking && ( // Show only when isThinking is true
               <div className="flex justify-start animate-fade-in-up">
                 <div className="bg-gray-800 text-gray-100 p-5 rounded-3xl border border-purple-600 shadow-lg w-full max-w-[85%]">
                   <div className="space-y-4">
@@ -385,7 +383,7 @@ export default function DrXChat() {
                           <ChevronDown className="h-3 w-3 mr-2 text-gray-400" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200">
+                      <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200" key="dropdown-menu-content-model">
                         <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">Dr.X 3</DropdownMenuItem>
                         <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">Dr.X 2</DropdownMenuItem>
                       </DropdownMenuContent>
