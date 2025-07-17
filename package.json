@@ -1,13 +1,17 @@
-	{
+{
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
+
+  // 🎯 أوامر التشغيل والتطوير
   "scripts": {
-    "build": "next build",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
-    "lint": "next lint",
-    "start": "next start"
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
+
+  // 📦 المكتبات المستخدمة في المشروع
   "dependencies": {
     "@ai-sdk/deepseek": "^0.2.16",
     "@ai-sdk/openai": "^1.3.23",
@@ -64,6 +68,8 @@
     "vaul": "latest",
     "zod": "^3.24.1"
   },
+
+  // 🧪 أدوات التطوير والمساعدة
   "devDependencies": {
     "@types/node": "^22",
     "@types/react": "^19",
