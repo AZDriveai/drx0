@@ -1,565 +1,429 @@
-"use client";
+"use client"
 
 import { useState, useEffect, useRef } from 'react';
-import { useChat } from "ai/react";
-import {
-  Menu, Search, Settings, User, Code, FileText, Bot, ChevronDown, Send,
-  Plus, Terminal, GitBranch, Share2, Play, Book, Zap, Lightbulb, TrendingUp,
-  Database, Layout, Layers, Brain, Sparkles, ImageIcon, Newspaper, Paperclip, ArrowUp
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useChat } from "ai/react" // Re-introducing useChat
+import { Button } from "@/components/ui/button" // Assuming these components are available
+import { Search, Settings, User, Newspaper, ChevronDown, Paperclip, ArrowUp, ImageIcon, Sparkles, Brain, Layers } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-// Placeholder for Image component (since Next.js Image component might not work directly in this environment)
+// Define a placeholder for Image component if it's not available in this environment
 const Image = ({ src, alt, width, height, className }) => {
-  // Using a generic placeholder image for now, as specific ones were not provided for this new design
-  const placeholderSrc = 'https://placehold.co/64x64/33334d/ffffff?text=AI';
-  return <img src={src || placeholderSrc} alt={alt} width={width} height={height} className={className} onError={(e) => e.target.src = placeholderSrc} />;
+  // Use the new placeholder image URLs provided by the user
+  const placeholderSrc = src.includes('88x33') 
+    ? 'https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/e0f8aad7-058d-48db-8441-017105a8ca21' 
+    : 'https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/e0f8aad7-058d-48db-8441-017105a8ca21';
+  return <img src={placeholderSrc} alt={alt} width={width} height={height} className={className} onError={(e) => e.target.src = placeholderSrc} />;
 };
 
-// --- AI Agent Data (Simulated) ---
-const aiAgents = [
-  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', description: 'Strikes the ideal balance between intelligence and speed', icon: 'https://placehold.co/64x64/FF8C00/ffffff?text=C3.5' },
-  { id: 'llama-3-2-1b', name: 'Llama3.2:1b', description: 'Your new AI Code Assistant', icon: 'https://placehold.co/64x64/6A0DAD/ffffff?text=L3.2' },
-  { id: 'llama-3-2-90b-groq', name: 'Llama 3.2 - 90B Groq', description: 'Limitless knowledge, precise answers.', icon: 'https://placehold.co/64x64/DC143C/ffffff?text=G90B' },
-  { id: 'python-3-10-expert', name: 'Python 3.10 Expert', description: 'A comprehensive source for Python programming guidance', icon: 'https://placehold.co/64x64/306998/ffffff?text=PY' },
-  { id: 'javascript-es13-expert', name: 'Javascript ES13 Expert', description: 'A thorough and authoritative source for all JavaScript-related queries.', icon: 'https://placehold.co/64x64/F7DF1E/000000?text=JS' },
-  { id: 'gpt-4o', name: 'GPT-4o', description: 'The most advanced model for complex tasks.', icon: 'https://placehold.co/64x64/10B981/ffffff?text=G4o' },
-];
 
-// --- Code Files Data (Simulated) ---
-const codeFiles = {
-  'contact_page.jsx': `/**
- * Contact page that accepts a name, email, and message in a form
- */
-import React, { useState } from 'react';
-
-const ContactPage = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Message sent successfully!'); // Using alert for simplicity, replace with modal in production
-  };
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Contact Us</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
-          <textarea
-            id="message"
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            rows="4"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            required
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Send Message
-        </button>
-      </form>
-    </div>
-  );
-};
-
-export default ContactPage;
-`,
-  'test.py': `print("Hello, CODEGPT!")
-# This is a simple Python test file.
-def greet(name):
-    return f"Hello, {name}!"
-
-print(greet("World"))
-`,
-  'app_swarm.py': `from swarm_api import Swarm, Agent
-
-# Initialize the Swarm client
-client = Swarm()
-
-# Define the assistant agent
-assistant_agent = Agent(
-    name="Assistant Agent",
-    instructions="You are a helpful assistant. Respond to user queries to the best of your ability.",
-)
-
-# Function to print messages nicely
-def pretty_print_messages(messages):
-    for message in messages:
-        if message["content"] is None:
-            continue
-        print(f"{message['sender']}: {message['content']}")
-
-# Initialize an empty list to store messages
-messages = []
-
-# Start the interaction loop
-while True:
-    user_input = input("You: ")
-    if user_input.lower() == 'exit':
-        break
-
-    # Add user message to history
-    messages.append({"sender": "User", "content": user_input})
-
-    # Get response from the assistant agent
-    response = client.send_message(assistant_agent, user_input)
-    messages.append({"sender": "Assistant", "content": response})
-
-    # Print messages
-    pretty_print_messages(messages)
-`,
-  'result.python': `import os
-import json
-import pandas as pd
-import streamlit as st
-import matplotlib.pyplot as plt
-
-def list_json_files(directory):
-    return [f for f in os.listdir(directory) if f.endswith('.json')]
-
-def load_json_file(filepath):
-    with open(filepath, 'r') as file:
-        return json.load(file)
-
-def display_as_table(data):
-    rows = []
-    for entry in data:
-        model = entry.get('model', '')
-        for task in entry.get('task_get', []):
-            rows.append({
-                'Model': model,
-                'Description': task.get('description', ''),
-                'Generated Code': task.get('generated_code', ''),
-                'Success': task.get('success', ''),
-                'Message': task.get('message', ''),
-                'Execution Time': task.get('execution_time', ''),
-                'Response Time': task.get('response_time', '')
-            })
-    df = pd.DataFrame(rows)
-    return df
-
-def main():
-    st.title("LLM Code Benchmarks")
-    directory = 'results'
-    json_files = list_json_files(directory)
-
-    if not json_files:
-        st.write("No JSON files found in the directory.")
-        return
-
-    selected_file = st.selectbox("Select a JSON file:", json_files)
-
-    if selected_file:
-        filepath = os.path.join(directory, selected_file)
-        data = load_json_file(filepath)
-        df = display_as_table(data)
-        st.dataframe(df)
-
-        # Optional: Plotting some data
-        if not df.empty:
-            st.subheader("Execution Times")
-            fig, ax = plt.subplots()
-            df.plot(kind='bar', x='Model', y='Execution Time', ax=ax)
-            st.pyplot(fig)
-
-if __name__ == "__main__":
-    main()
-`
-};
-
-export default function CodeGPTChat() {
-  const [selectedAgent, setSelectedAgent] = useState(aiAgents[0]);
-  const [selectedCodeFile, setSelectedCodeFile] = useState('contact_page.jsx');
+export default function DrXChat() {
+  // State for managing thinking animation and manifestation
   const [isThinking, setIsThinking] = useState(false);
   const [currentStage, setCurrentStage] = useState(0);
-  const [completedStages, setCompletedStages] = useState(new Set());
+  const [completedStages, setCompletedStages] = new Set();
+  const [manifestationVisible, setManifestationVisible] = useState(false);
   const stageTimerRef = useRef(null);
   const thinkingStartTime = useRef(0);
-  const chatContainerRef = useRef(null);
-
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
-    api: '/api/chat',
+  
+  // Use useChat hook for AI integration
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat', // Pointing to your Next.js API route
     onResponse: () => {
+      // When the AI starts responding, start the visual thinking process
       handleThinkingStart();
     },
     onFinish: () => {
-      handleThinkingEnd();
-      scrollToBottom();
+      // Ensure thinking display ends when response is finished
+      if (isThinking) handleThinkingEnd();
     },
     onError: (error) => {
       console.error("Chat error:", error);
-      handleThinkingEnd();
-      // Add a user-friendly error message to the chat
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { id: `error-${Date.now()}`, role: 'assistant', content: "حدث خطأ أثناء توليد الاستجابة. يرجى المحاولة مرة أخرى." },
-      ]);
-      scrollToBottom();
+      if (isThinking) handleThinkingEnd();
+      // Optionally, add an error message to the chat
+      // setMessages((prevMessages) => [...prevMessages, { id: `error-${Date.now()}`, role: 'assistant', content: "حدث خطأ أثناء توليد الاستجابة. يرجى المحاولة مرة أخرى." }]);
     }
   });
 
-  // Scroll to bottom of chat on new messages
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  // Thinking animation logic
+  // Cosmic Thinking Stages
   const THINKING_STAGES = [
     { title: "⚛️ تشكل الجسيمات الفكرية", description: "تجمع الكوانتوم المعرفي" },
     { title: "🌀 توليد حقول المعرفة", description: "بناء النماذج الأولية" },
     { title: "🌌 تشابك المفاهيم", description: "ربط المجالات المعرفية" },
     { title: "✨ تكوّن البصيرة الكونية", description: "بلورة الرؤية النهائية" }
   ];
-
+  
+  // Function to start the thinking process
   const handleThinkingStart = () => {
     setIsThinking(true);
+    setManifestationVisible(true);
     thinkingStartTime.current = Date.now();
     setCurrentStage(0);
     setCompletedStages(new Set());
-
+    
+    // Advance stages with a delay
     let stageCounter = 0;
     const advanceStage = () => {
       if (stageCounter < THINKING_STAGES.length) {
         setCurrentStage(stageCounter);
         setCompletedStages(prev => new Set([...prev, stageCounter]));
         stageCounter++;
-        stageTimerRef.current = setTimeout(advanceStage, 1500);
+        stageTimerRef.current = setTimeout(advanceStage, 1500); // 1.5 seconds per stage
       }
     };
+    
     advanceStage();
   };
 
+  // Function to end the thinking process, ensuring minimum display time
   const handleThinkingEnd = () => {
     const elapsed = Date.now() - thinkingStartTime.current;
-    const minThinkingTime = 4500;
+    const minThinkingTime = 4500; // Minimum display time for thinking: 4.5 seconds
     const remainingTime = Math.max(minThinkingTime - elapsed, 0);
-
+    
     setTimeout(() => {
       setIsThinking(false);
       clearTimeout(stageTimerRef.current);
+      
+      // Show final manifestation message briefly
+      setManifestationVisible(true);
+      setTimeout(() => setManifestationVisible(false), 3000); // Display for 3 seconds
     }, remainingTime);
   };
 
+  // Handle form submission - now directly uses handleSubmit from useChat
+  const handleFormSubmit = (e) => {
+    // handleThinkingStart will be called by useChat's onResponse
+    handleSubmit(e);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-100 font-sans antialiased overflow-hidden" dir="rtl">
-      {/* Sidebar */}
-      <aside className="w-16 md:w-64 flex-shrink-0 bg-gray-800 border-l border-gray-700 flex flex-col transition-all duration-300 ease-in-out">
-        {/* Top Menu */}
-        <div className="flex items-center justify-center md:justify-start h-14 border-b border-gray-700 px-4">
-          <Button variant="ghost" size="icon" className="md:hidden text-gray-400 hover:bg-gray-700 rounded-lg">
-            <Menu className="h-6 w-6" />
-          </Button>
-          <div className="hidden md:flex items-center text-xl font-bold text-gray-100">
-            <Code className="h-7 w-7 text-purple-400 mr-2" />
-            CODEGPT
-          </div>
-        </div>
-
-        {/* AI Agent Selector */}
-        <div className="p-2 md:p-4 border-b border-gray-700">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-center md:justify-between bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 rounded-lg py-2 px-3 text-sm flex items-center">
-                <Image src={selectedAgent.icon} alt={selectedAgent.name} width={24} height={24} className="rounded-full mr-0 md:mr-2" />
-                <span className="hidden md:block truncate">{selectedAgent.name}</span>
-                <ChevronDown className="h-4 w-4 ml-0 md:ml-2 hidden md:block" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200 w-56" key="ai-agent-dropdown">
-              {aiAgents.map(agent => (
-                <DropdownMenuItem key={agent.id} onClick={() => setSelectedAgent(agent)} className="flex items-center cursor-pointer hover:bg-gray-700 py-2 px-4">
-                  <Image src={agent.icon} alt={agent.name} width={20} height={20} className="rounded-full mr-2" />
-                  {agent.name}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Navigation Icons */}
-        <nav className="flex flex-col items-center md:items-start p-2 md:p-4 space-y-2 border-b border-gray-700">
-          <Button variant="ghost" className="w-full justify-center md:justify-start text-gray-400 hover:bg-gray-700 rounded-lg py-2 px-3">
-            <Layout className="h-6 w-6 mr-0 md:mr-3" />
-            <span className="hidden md:block">Home</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-center md:justify-start text-gray-400 hover:bg-gray-700 rounded-lg py-2 px-3">
-            <Search className="h-6 w-6 mr-0 md:mr-3" />
-            <span className="hidden md:block">Search</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-center md:justify-start text-gray-400 hover:bg-gray-700 rounded-lg py-2 px-3">
-            <FileText className="h-6 w-6 mr-0 md:mr-3" />
-            <span className="hidden md:block">Files</span>
-          </Button>
-          <Button variant="ghost" className="w-full justify-center md:justify-start text-gray-400 hover:bg-gray-700 rounded-lg py-2 px-3">
-            <Bot className="h-6 w-6 mr-0 md:mr-3" />
-            <span className="hidden md:block">Agents</span>
-          </Button>
-        </nav>
-
-        {/* My Agents Section */}
-        <div className="flex-1 p-2 md:p-4 overflow-y-auto custom-scrollbar">
-          <div className="flex items-center justify-between mb-3 hidden md:flex">
-            <h4 className="text-sm font-semibold text-gray-400">MY AGENTS</h4>
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-purple-400">
-              <Plus className="h-4 w-4" />
-              <span className="ml-1">Create</span>
-            </Button>
-          </div>
-          {/* Agent Cards (simplified) */}
-          <div className="space-y-2 hidden md:block">
-            {['SAP', 'Ruby on Rails', 'Next.js Expert', 'Spring Expert', 'Streamlit', 'Angular Expert', 'PyTorch Expert', 'CrewAI', 'LlamaIndex Python'].map((agentName, index) => (
-              <div key={index} className="flex items-center bg-gray-700/50 rounded-lg p-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer">
-                <Image src="" alt={agentName} width={20} height={20} className="rounded-full mr-2" />
-                {agentName}
-              </div>
+    <div className="min-h-screen bg-[#0f0f1a] text-white font-inter" dir="rtl">
+      {/* Cosmic Animated Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0c0b15] to-[#1a1a2e]"></div>
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E")`
+        }}></div>
+        
+        {/* Animated Particles */}
+        {isThinking && (
+          <>
+            {[...Array(30)].map((_, i) => (
+              <div 
+                key={i}
+                className="absolute rounded-full bg-purple-400 opacity-40 animate-particle-float"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  width: `${Math.random() * 8 + 2}px`,
+                  height: `${Math.random() * 8 + 2}px`,
+                  animationDuration: `${Math.random() * 4 + 3}s`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  boxShadow: '0 0 8px rgba(192, 132, 252, 0.7)' // Subtle glow
+                }}
+              ></div>
             ))}
-          </div>
-        </div>
+          </>
+        )}
+      </div>
 
-        {/* Settings Button */}
-        <div className="p-2 md:p-4 border-t border-gray-700">
-          <Button variant="ghost" className="w-full justify-center md:justify-start text-gray-400 hover:bg-gray-700 rounded-lg py-2 px-3">
-            <Settings className="h-6 w-6 mr-0 md:mr-3" />
-            <span className="hidden md:block">Settings</span>
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <header className="h-14 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4 flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <h1 className="text-lg font-semibold text-gray-100 hidden md:block">CODEGPT CHAT</h1>
-            <div className="flex items-center text-gray-400 text-sm">
-              <span className="ml-2">LLMCodeBenchmarks</span>
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-gradient-to-b from-[#0f0f1a] to-transparent backdrop-blur-sm shadow-lg">
+        <div className="flex items-center justify-between h-full px-4 max-w-7xl mx-auto">
+          {/* Logo */}
+          <div className="flex items-center">
+            <div className="relative">
+              <Image src="/images/drx-logo.png" alt="Dr.X" width={88} height={33} className="mr-2" />
             </div>
           </div>
+
+          {/* Right buttons */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-gray-700 rounded-lg">
-              <Code className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-gray-700 rounded-lg">
-              <FileText className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-gray-700 rounded-lg">
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-gray-300 hover:bg-white/10 transition-colors">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:bg-gray-700 rounded-lg">
+
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-gray-300 hover:bg-white/10 transition-colors hidden sm:flex">
               <Settings className="h-5 w-5" />
             </Button>
-          </div>
-        </header>
 
-        {/* Chat and Code Editor Panels */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Chat Panel */}
-          <div className="flex-1 flex flex-col bg-gray-900 border-l border-gray-700 overflow-hidden">
-            {/* Current AI Agent Display */}
-            <div className="flex flex-col items-center justify-center p-8 border-b border-gray-800 flex-shrink-0">
-              <Image src={selectedAgent.icon} alt={selectedAgent.name} width={96} height={96} className="rounded-full mb-4 shadow-lg" />
-              <h2 className="text-2xl font-bold text-gray-100 mb-2">{selectedAgent.name}</h2>
-              <p className="text-gray-400 text-center max-w-sm">{selectedAgent.description}</p>
-              <div className="flex gap-3 mt-4">
-                <Button variant="outline" className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 rounded-full px-4 py-2 text-sm">
-                  <Code className="h-4 w-4 mr-2" />
-                  Code-Interpreter
-                </Button>
-                <Button variant="outline" className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 rounded-full px-4 py-2 text-sm">
-                  <Book className="h-4 w-4 mr-2" />
-                  Stackoverflow
-                </Button>
-                <Button variant="outline" className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 rounded-full px-4 py-2 text-sm">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Codebuilder
-                </Button>
+            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 rounded-full h-9 px-4 text-sm font-medium shadow-lg transition-all duration-300 transform hover:scale-105">
+              <User className="h-4 w-4 ml-2" />
+              سجل
+            </Button>
+
+            <Button
+              variant="outline"
+              className="rounded-full h-9 px-4 text-sm bg-transparent border-gray-600 text-gray-300 hover:bg-white/10 hover:border-blue-500 transition-all hidden sm:flex"
+            >
+              تسجيل الدخول
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Thinking Manifestation Overlay */}
+      {manifestationVisible && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="bg-gradient-to-br from-[#1e1b4b] to-[#0c0a26] p-8 rounded-3xl border border-purple-500/50 max-w-md text-center shadow-2xl animate-scaleIn relative overflow-hidden">
+            {/* Pulsing glow effect */}
+            <div className="absolute inset-0 rounded-3xl animate-pulse-glow" style={{
+              boxShadow: '0 0 40px rgba(192, 132, 252, 0.6), inset 0 0 20px rgba(192, 132, 252, 0.4)'
+            }}></div>
+
+            <div className="relative z-10"> {/* Ensure content is above glow */}
+              <div className="flex justify-center mb-4">
+                <Sparkles className="h-14 w-14 text-yellow-300 animate-sparkle-pulse" />
+              </div>
+              <h3 className="text-3xl font-extrabold mb-3 text-purple-200 drop-shadow-lg">اكتمل التفكير الكوني</h3>
+              <p className="text-lg mb-6 text-gray-300">د.إكس على وشك الإجابة على استفسارك...</p>
+              <div className="flex justify-center space-x-4">
+                {[1, 2, 3].map(num => (
+                  <div 
+                    key={num} 
+                    className="w-12 h-12 rounded-full bg-purple-700 flex items-center justify-center text-2xl font-bold text-white shadow-lg animate-bounce-delay"
+                    style={{ animationDelay: `${num * 0.2}s` }}
+                  >
+                    {4 - num}
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* Chat Messages Area */}
-            <div ref={chatContainerRef} className="flex-1 p-6 overflow-y-auto custom-scrollbar space-y-6">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[80%] p-4 rounded-xl shadow-md ${
-                      message.role === "user"
-                        ? "bg-blue-700 text-white rounded-br-none"
-                        : "bg-gray-700 text-gray-100 rounded-bl-none"
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
-                  </div>
+      {/* Main Content */}
+      <main className="pt-16 min-h-screen flex flex-col">
+        {/* Center Content */}
+        <div className="flex-1 flex flex-col items-center justify-start px-4 pb-32 overflow-y-auto custom-scrollbar">
+          {/* Large Logo - Only visible when no messages */}
+          {messages.length === 0 && (
+            <div className="mb-12 mt-24 flex flex-col items-center justify-center">
+              <div className="relative">
+                <Image src="/images/drx-logo-large.png" alt="Dr.X" width={320} height={64} className="max-w-full h-auto" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute w-full h-full bg-purple-500 rounded-full opacity-20 blur-3xl animate-pulse-slow"></div>
                 </div>
-              ))}
+              </div>
+              <p className="text-center mt-6 text-gray-400 text-lg">ابدأ رحلتك المعرفية مع د.إكس</p>
+            </div>
+          )}
 
-              {/* Thinking Process Indicator */}
-              {isLoading && (
-                <div className="flex justify-start animate-fade-in-up">
-                  <div className="bg-gray-700 text-gray-100 p-4 rounded-xl shadow-md w-full max-w-[80%] rounded-bl-none">
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-purple-400"></div>
-                      <span className="text-sm text-gray-300">
-                        {THINKING_STAGES[currentStage]?.title || "د.إكس في حالة تفكير عميق..."}
-                      </span>
+          {/* Quick Action Buttons - Mobile Only */}
+          {messages.length === 0 && (
+            <div className="flex flex-wrap gap-3 justify-center mb-12 sm:hidden max-w-md w-full">
+              <Button
+                variant="outline"
+                className="rounded-full px-5 py-3 text-base border-gray-600 bg-transparent text-gray-300 hover:bg-white/10 hover:border-blue-500 transition-all flex-1 min-w-[150px]"
+              >
+                <ImageIcon className="h-5 w-5 ml-2 text-gray-400" />
+                تعديل الصورة
+              </Button>
+
+              <Button
+                variant="outline"
+                className="rounded-full px-5 py-3 text-base border-gray-600 bg-transparent text-gray-300 hover:bg-white/10 hover:border-blue-500 transition-all flex-1 min-w-[150px]"
+              >
+                <Newspaper className="h-5 w-5 ml-2 text-gray-400" />
+                آخر الأخبار
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="rounded-full px-5 py-3 text-base border-gray-600 bg-transparent text-gray-300 hover:bg-white/10 hover:border-blue-500 transition-all flex-1 min-w-[150px]"
+                  >
+                    <User className="h-5 w-5 ml-2" />
+                    شخصيات
+                    <ChevronDown className="h-4 w-4 mr-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200">
+                  <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">المميز 1</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">المتقدم 2</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+
+          {/* Chat Messages */}
+          <div className="w-full max-w-4xl mb-6 space-y-6 px-2">
+            {messages.map((message) => (
+              <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`max-w-[85%] p-4 rounded-3xl shadow-md transition-all duration-300 ${
+                    message.role === "user" 
+                      ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-br-none" 
+                      : "bg-gray-800 text-gray-100 border border-gray-700 rounded-bl-none"
+                  }`}
+                >
+                  <p className="text-base leading-relaxed">{message.content}</p>
+                </div>
+              </div>
+            ))}
+            
+            {/* Display Thinking Process */}
+            {isThinking && (
+              <div className="flex justify-start animate-fade-in-up">
+                <div className="bg-gray-800 text-gray-100 p-5 rounded-3xl border border-purple-600 shadow-lg w-full max-w-[85%]">
+                  <div className="space-y-4">
+                    <div className="font-bold text-purple-300 mb-2 flex items-center text-lg">
+                      <Brain className="h-6 w-6 ml-3 text-purple-400 animate-pulse-fast" />
+                      د.إكس في حالة تفكير عميق
+                      <div className="relative mr-3">
+                        <span className="text-sm text-gray-400">محادثة AI</span>
+                        <div className="absolute -top-2 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold border border-purple-400">
+                          {currentStage + 1}
+                        </div>
+                      </div>
                     </div>
-                    {/* Optional: Display detailed thinking stages if needed */}
-                    {/* <div className="space-y-2 mt-2 text-xs text-gray-400">
+                    <div className="space-y-3">
                       {THINKING_STAGES.map((stage, index) => (
-                        <div key={index} className={`flex items-center ${completedStages.has(index) ? 'opacity-100' : 'opacity-60'}`}>
-                          <span className={`w-2 h-2 rounded-full mr-2 ${index === currentStage ? 'bg-purple-400' : completedStages.has(index) ? 'bg-green-500' : 'bg-gray-600'}`}></span>
-                          {stage.description}
+                        <div 
+                          key={index} 
+                          className={`flex items-start transition-opacity duration-500 ${
+                            completedStages.has(index) ? 'opacity-100' : 'opacity-60'
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded-full flex-shrink-0 mr-3 mt-1 ${
+                            index === currentStage 
+                              ? 'bg-purple-500 animate-ping-once' 
+                              : completedStages.has(index) 
+                                ? 'bg-green-500' 
+                                : 'bg-gray-600'
+                          }`}></div>
+                          <div>
+                            <div className="font-medium text-base text-gray-200">{stage.title}</div>
+                            <div className="text-sm text-gray-400">{stage.description}</div>
+                          </div>
                         </div>
                       ))}
-                    </div> */}
+                    </div>
+                    <div className="mt-4 text-sm text-gray-400 flex items-center pt-2 border-t border-gray-700">
+                      <Layers className="h-4 w-4 ml-2 text-blue-400" />
+                      هذه العملية قد تستغرق بضع ثوانٍ بينما نستكشف أبعاد المعرفة...
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-            {/* Chat Input Area */}
-            <form onSubmit={handleSubmit} className="p-4 bg-gray-800 border-t border-gray-700 flex-shrink-0">
-              <div className="bg-gray-700 rounded-lg flex items-center p-2 border border-gray-600">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center text-gray-300 hover:bg-gray-600 rounded-md px-3 py-1 text-sm">
-                      <Image src={aiAgents[0].icon} alt="Model" width={18} height={18} className="rounded-full mr-1" />
-                      <span className="hidden sm:inline">GPT-4o</span>
-                      <ChevronDown className="h-3 w-3 ml-1" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200 w-48" key="model-selector-dropdown">
-                    {aiAgents.map(agent => (
-                      <DropdownMenuItem key={agent.id} onClick={() => setSelectedAgent(agent)} className="flex items-center cursor-pointer hover:bg-gray-700 py-2 px-4">
-                        <Image src={agent.icon} alt={agent.name} width={18} height={18} className="rounded-full mr-2" />
-                        {agent.name}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Button variant="ghost" className="flex items-center text-gray-300 hover:bg-gray-600 rounded-md px-3 py-1 text-sm mr-2">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Import selection
-                </Button>
-
+        {/* Chat Input - Fixed at bottom */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0f0f1a] to-transparent p-4 z-30">
+          <div className="max-w-4xl mx-auto">
+            <form onSubmit={handleFormSubmit}>
+              <div className="bg-[#1a1b26] rounded-3xl border border-gray-700 p-4 relative backdrop-blur-sm shadow-xl focus-within:border-blue-500 transition-colors duration-300">
+                {/* Text Input */}
                 <textarea
                   value={input}
                   onChange={handleInputChange}
-                  placeholder="/ for slash commands: /Fix, /Explain, @document for file mentions"
-                  className="flex-1 bg-transparent text-white placeholder-gray-400 resize-none outline-none py-2 px-3 text-sm custom-scrollbar min-h-[40px]"
+                  placeholder="ماذا تريد أن تعرف؟"
+                  className="w-full bg-transparent text-white placeholder-gray-400 resize-none outline-none min-h-[44px] py-2 px-2 pb-14 text-base custom-scrollbar"
                   rows={1}
-                  style={{ maxHeight: '100px' }}
+                  style={{ maxHeight: '150px' }} // Limit textarea height
                 />
 
-                <Button type="submit" size="icon" className="bg-purple-600 hover:bg-purple-700 text-white rounded-md h-9 w-9 ml-2 flex-shrink-0" disabled={isLoading || !input.trim()}>
-                  {isLoading ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Send className="h-5 w-5" />}
-                </Button>
+                {/* Bottom Controls */}
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {/* Attach Button */}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full border border-gray-600 text-gray-400 hover:bg-white/10 transition-colors"
+                      disabled={isLoading}
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+
+                    {/* DeepSearch */}
+                    <div className="flex items-center border border-gray-600 rounded-full bg-gray-900/50 overflow-hidden">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="rounded-r-none px-4 py-2 text-sm text-gray-300 hover:bg-white/10 transition-colors"
+                        disabled={isLoading}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="ml-2 text-blue-400">
+                          <path
+                            d="M2 13.8236C4.5 22.6927 18 21.3284 18 14.0536C18 9.94886 11.9426 9.0936 10.7153 11.1725C9.79198 12.737 14.208 12.6146 13.2847 14.1791C12.0574 16.2581 6 15.4029 6 11.2982C6 3.68585 20.5 2.2251 22 11.0945"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          />
+                        </svg>
+                        DeepSearch
+                      </Button>
+                      <div className="w-px h-6 bg-gray-600" />
+                      <Button type="button" variant="ghost" size="icon" className="rounded-l-none text-gray-300 hover:bg-white/10 transition-colors" disabled={isLoading}>
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </div>
+
+                    {/* Think Button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="rounded-full px-4 py-2 text-sm border-gray-600 text-gray-300 hover:bg-white/10 bg-transparent transition-colors"
+                      disabled={isLoading}
+                    >
+                      <Brain className="h-4 w-4 ml-2 text-purple-400" />
+                      Think
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Model Selector */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="rounded-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 transition-colors" disabled={isLoading}>
+                          <span className="text-blue-400 font-medium">Dr.X 3</span>
+                          <ChevronDown className="h-3 w-3 mr-2 text-gray-400" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-gray-800 border-gray-700 text-gray-200">
+                        <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">Dr.X 3</DropdownMenuItem>
+                        <DropdownMenuItem className="hover:bg-gray-700 cursor-pointer py-2 px-4">Dr.X 2</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Send Button */}
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!input.trim() || isLoading}
+                    >
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                      ) : (
+                        <ArrowUp className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </form>
-          </div>
 
-          {/* Code Editor Panel */}
-          <div className="hidden md:flex flex-col flex-1 bg-gray-900 border-l border-gray-700 overflow-hidden">
-            {/* File Tabs */}
-            <div className="flex items-center border-b border-gray-700 flex-shrink-0">
-              {Object.keys(codeFiles).map(fileName => (
-                <Button
-                  key={fileName}
-                  variant="ghost"
-                  onClick={() => setSelectedCodeFile(fileName)}
-                  className={`px-4 py-2 text-sm rounded-none border-b-2 ${
-                    selectedCodeFile === fileName
-                      ? 'text-purple-400 border-purple-500 bg-gray-800'
-                      : 'text-gray-400 border-transparent hover:bg-gray-700'
-                  }`}
-                >
-                  {fileName}
-                </Button>
-              ))}
-            </div>
-
-            {/* Code Display */}
-            <div className="flex-1 p-4 font-mono text-sm overflow-y-auto custom-scrollbar">
-              <pre className="whitespace-pre-wrap break-words">
-                <code>{codeFiles[selectedCodeFile]}</code>
-              </pre>
-            </div>
-
-            {/* Editor Bottom Bar (Simulated) */}
-            <div className="flex-shrink-0 border-t border-gray-700 bg-gray-800 text-xs text-gray-400 flex items-center justify-between h-8 px-4">
-              <span>Line 1, Column 1</span>
-              <span>Spaces: 4</span>
-              <span>LF</span>
-              <span>UTF-8</span>
-              <span>Python 3.11.7 64-bit</span>
+            {/* Footer Text */}
+            <div className="text-center text-xs text-gray-400 mt-4">
+              بإرسالك رسالة إلى Dr.X، فإنك توافق على{" "}
+              <a href="#" className="text-blue-400 hover:underline transition-colors">
+                الشروط
+              </a>{" "}
+              و{" "}
+              <a href="#" className="text-blue-400 hover:underline transition-colors">
+                سياسة الخصوصية
+              </a>
+              .
             </div>
           </div>
         </div>
-
-        {/* Bottom Status Bar */}
-        <footer className="h-8 bg-gray-800 border-t border-gray-700 text-xs text-gray-400 flex items-center justify-between px-4 flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <span className="text-purple-400">main*</span>
-            <span className="flex items-center"><Lightbulb className="h-3 w-3 mr-1" /> Launchpad</span>
-            <span className="flex items-center"><TrendingUp className="h-3 w-3 mr-1" /> 0 A 0</span>
-            <span className="flex items-center"><Share2 className="h-3 w-3 mr-1" /> Live Share</span>
-            <span className="flex items-center"><GitBranch className="h-3 w-3 mr-1" /> Git Graph</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:bg-gray-700 rounded-md h-6 px-2">
-              <Play className="h-3 w-3 mr-1" /> Go Live
-            </Button>
-            <span>CODEGPT</span>
-          </div>
-        </footer>
-      </div>
+      </main>
     </div>
-  );
+  )
 }
-
