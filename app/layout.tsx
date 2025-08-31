@@ -1,24 +1,33 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
+import { cookies } from 'next/headers';
 
-const inter = Inter({ subsets: ["latin"] })
+import { AppSidebar } from '../components/app-sidebar';
+import { SidebarInset, SidebarProvider } from '../components/ui/sidebar';
+import { auth } from '../api/auth';
+import Script from 'next/script';
+import { DataStreamProvider } from '@/components/data-stream-provider';
 
-export const metadata: Metadata = {
-  title: "Dr.X Chat App",
-  description: "A chat application inspired by Dr.X",
-    generator: 'v0.dev'
-}
+export const experimental_ppr = true;
 
-export default function RootLayout({
+export default async function Layout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: {
+  children: React.ReactNode;
+}) {
+  const [session, cookieStore] = await Promise.all([auth(), cookies()]);
+  const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
+
   return (
-    <html lang="ar" dir="rtl">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
+    <>
+      <Script
+        src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
+        strategy="beforeInteractive"
+      />
+      <DataStreamProvider>
+        <SidebarProvider defaultOpen={!isCollapsed}>
+          <AppSidebar user={session?.user} />
+          <SidebarInset>{children}</SidebarInset>
+        </SidebarProvider>
+      </DataStreamProvider>
+    </>
+  );
 }
